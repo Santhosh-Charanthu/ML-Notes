@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>📘 Day 3 Notes – Linear Regression (Placement Interview Notes)</title>
+<style>
+:root{color-scheme:light;--fg:#0f172a;--muted:#64748b;--border:#e2e8f0;--accent:#0284c7;--accent-soft:#e0f2fe;--card:#ffffff;--code-bg:#0f172a;--code-fg:#e2e8f0;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:linear-gradient(180deg,#e0f2fe 0%,#f0f9ff 60%,#ffffff 100%);color:var(--fg);min-height:100vh;padding:32px 16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.page{max-width:920px;margin:0 auto}
+.doc{background:var(--card);border-radius:18px;box-shadow:0 20px 60px -20px rgba(2,132,199,.25),0 4px 14px -4px rgba(15,23,42,.08);padding:clamp(24px,5vw,60px);border:1px solid rgba(148,163,184,.2)}
+.title-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin:0 0 1.2em;padding-bottom:.5em;border-bottom:1px solid var(--border)}
+.title-row h1{margin:0;padding:0;border:0;flex:1 1 auto;min-width:0}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;border:1px solid rgba(2,132,199,.2);white-space:nowrap;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;box-shadow:0 1px 2px rgba(2,132,199,.08);flex:0 0 auto;margin-left:auto;margin-right:8px}
+.badge:hover{background:#bae6fd;transform:translateY(-1px);box-shadow:0 6px 16px -6px rgba(2,132,199,.35)}
+h1,h2,h3,h4,h5,h6{font-weight:700;line-height:1.25;margin:1.8em 0 .6em;letter-spacing:-.01em}
+h1{font-size:2.15rem;border-bottom:1px solid var(--border);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.6rem}
+h3{font-size:1.3rem}
+h4{font-size:1.1rem}
+p{margin:.9em 0}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+strong{font-weight:700}
+del{color:var(--muted)}
+ul,ol{margin:.8em 0;padding-left:1.6em}
+li{margin:.25em 0}
+blockquote{margin:1.2em 0;padding:.5em 1.1em;border-left:4px solid var(--accent);background:var(--accent-soft);color:#334155;border-radius:0 .5rem .5rem 0}
+hr{margin:2em 0;border:0;border-top:1px solid var(--border)}
+img{max-width:100%;border-radius:.5rem;margin:1em 0}
+code{font-family:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.9em;padding:.15em .4em;background:#f1f5f9;color:#0c4a6e;border-radius:.35rem;border:1px solid var(--border)}
+pre{margin:1.2em 0;padding:1rem 1.1rem;background:var(--code-bg);color:var(--code-fg);border-radius:.7rem;overflow-x:auto;font-size:.9rem;line-height:1.55;border:1px solid #1e293b}
+pre code{background:transparent;border:0;padding:0;color:inherit;font-size:inherit}
+table{width:100%;border-collapse:collapse;margin:1.2em 0;display:block;overflow-x:auto;border:1px solid var(--border);border-radius:.6rem}
+thead{background:var(--accent-soft)}
+th,td{padding:.65em .9em;border-bottom:1px solid var(--border);text-align:left}
+th{font-weight:600}
+tr:last-child td{border-bottom:0}
+.callout{margin:1.5em 0;padding:1rem 1.1rem;border-radius:.8rem;border:1px solid var(--co-b,var(--border));background:var(--co-bg,#f8fafc);box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.callout-title{display:flex;align-items:center;gap:.55rem;font-weight:700;font-size:1rem;margin-bottom:.5rem;color:var(--co-fg,var(--fg))}
+.callout-icon{font-size:1.15rem;line-height:1}
+.callout-body>:first-child{margin-top:0}
+.callout-body>:last-child{margin-bottom:0}
+.callout-note{--co-bg:#eff6ff;--co-b:#bfdbfe;--co-fg:#1e40af}
+.callout-important{--co-bg:#faf5ff;--co-b:#e9d5ff;--co-fg:#6b21a8}
+.callout-warning{--co-bg:#fffbeb;--co-b:#fde68a;--co-fg:#92400e}
+.callout-tip{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-question{--co-bg:#ecfeff;--co-b:#a5f3fc;--co-fg:#155e75}
+.callout-observation{--co-bg:#f0fdfa;--co-b:#99f6e4;--co-fg:#115e59}
+.callout-complexity{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.callout-summary{--co-bg:#eef2ff;--co-b:#c7d2fe;--co-fg:#3730a3}
+.callout-advantage{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-disadvantage{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#94a3b8}
+.token.punctuation{color:#cbd5e1}
+.token.property,.token.tag,.token.constant,.token.symbol,.token.deleted{color:#fca5a5}
+.token.boolean,.token.number{color:#fdba74}
+.token.selector,.token.attr-name,.token.string,.token.char,.token.builtin,.token.inserted{color:#86efac}
+.token.operator,.token.entity,.token.url,.token.variable{color:#7dd3fc}
+.token.atrule,.token.attr-value,.token.function,.token.class-name{color:#f0abfc}
+.token.keyword{color:#c4b5fd}
+.token.regex,.token.important{color:#fcd34d}
+@media (max-width:640px){body{padding:12px 8px}.doc{padding:20px 16px;border-radius:12px}h1{font-size:1.7rem}.title-row{align-items:flex-start}.badge{font-size:12px;padding:5px 10px}}
+@media print{body{background:#fff;padding:0}.doc{box-shadow:none;border:0;padding:0;max-width:none}}
+</style>
+</head>
+<body>
+<main class="page"><article class="doc"><h1>📘 Day 3 Notes – Linear Regression (Placement Interview Notes)</h1>
+
+
+<blockquote>
+<p><strong>Goal:</strong> By the end of this topic, you should be able to explain Linear Regression confidently in campus interviews and implement it using Scikit-Learn.</p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>Table of Contents</h1>
+
+
+<ol>
+<li>What is Linear Regression?</li>
+<li>Why is it called Linear Regression?</li>
+<li>Real-world Applications</li>
+<li>Types of Regression</li>
+<li>Mathematical Equation</li>
+<li>Understanding Slope (<code>coef_</code>) and Intercept (<code>intercept_</code>)</li>
+<li>How Linear Regression Works</li>
+<li>Cost Function (Concept)</li>
+<li>Model Training (<code>fit()</code>)</li>
+<li>Prediction (<code>predict()</code>)</li>
+<li>Assumptions of Linear Regression</li>
+<li>Advantages</li>
+<li>Limitations</li>
+<li>Scikit-Learn Implementation</li>
+<li>Top 10 Interview Questions</li>
+</ol>
+
+
+<hr>
+
+
+<h1>1. What is Linear Regression?</h1>
+
+
+<p>Linear Regression is a <strong>supervised machine learning algorithm</strong> used to predict <strong>continuous numerical values</strong> by learning the best-fit linear relationship between the input features and the target variable.</p>
+
+
+<h3>Examples</h3>
+
+
+<ul>
+<li>House Price Prediction</li>
+<li>Salary Prediction</li>
+<li>Temperature Prediction</li>
+<li>Student Marks Prediction</li>
+<li>Sales Forecasting</li>
+</ul>
+
+
+<h3>Interview Definition</h3>
+
+
+<blockquote>
+<p>Linear Regression is a supervised learning algorithm used to predict continuous numerical values by learning the best-fit linear relationship between the input features and the target variable.</p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>2. Why is it Called &quot;Linear&quot; Regression?</h1>
+
+
+<p>It is called <strong>Linear Regression</strong> because it assumes there is an approximately <strong>linear (straight-line)</strong> relationship between the input features and the target variable.</p>
+
+
+<p>For example:</p>
+
+
+<table>
+<thead>
+<tr>
+<th align="right">Hours Studied</th>
+<th align="right">Marks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">1</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">20</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right">30</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td align="right">40</td>
+</tr>
+</tbody></table>
+
+
+<p>The relationship can be represented by a straight line.</p>
+
+
+<hr>
+
+
+<h1>3. Real-World Applications</h1>
+
+
+<p>Linear Regression is used when the output is <strong>continuous</strong>.</p>
+
+
+<p>Examples:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Can Linear Regression Be Used?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>House Price Prediction</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>Salary Prediction</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>Predict Temperature</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>Student Marks Prediction</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>Spam Detection</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td>Disease Prediction (Yes/No)</td>
+<td>❌ No</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h1>4. Types of Linear Regression</h1>
+
+
+<h2>Simple Linear Regression</h2>
+
+
+<p>Uses <strong>one input feature</strong>.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">Hours Studied → Marks</code></pre>
+
+<p>Only one feature:</p>
+
+
+<pre class="language-text"><code class="language-text">Hours Studied</code></pre>
+
+<hr>
+
+
+<h2>Multiple Linear Regression</h2>
+
+
+<p>Uses <strong>multiple input features</strong>.</p>
+
+
+<p>Example:</p>
+
+
+<p>Predict House Price using:</p>
+
+
+<ul>
+<li>Area</li>
+<li>Bedrooms</li>
+<li>Age of House</li>
+</ul>
+
+
+<p>These multiple features are used together to predict the target.</p>
+
+
+<hr>
+
+
+<h1>5. Mathematical Equation</h1>
+
+
+<p>Linear Regression learns the equation:</p>
+
+
+<p>Where:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>y</strong></td>
+<td>Predicted Output</td>
+</tr>
+<tr>
+<td><strong>x</strong></td>
+<td>Input Feature</td>
+</tr>
+<tr>
+<td><strong>m</strong></td>
+<td>Slope (Coefficient)</td>
+</tr>
+<tr>
+<td><strong>b</strong></td>
+<td>Intercept</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h2>Example</h2>
+
+
+<p>Suppose the model learns:</p>
+
+
+<p>Predict for:</p>
+
+
+<pre class="language-text"><code class="language-text">Hours Studied = 6</code></pre>
+
+<p>Calculation:</p>
+
+
+<pre class="language-text"><code class="language-text">Marks = (10 × 6) + 5
+      = 65</code></pre>
+
+<p>Predicted Marks = <strong>65</strong></p>
+
+
+<hr>
+
+
+<h1>6. Understanding <code>coef_</code> and <code>intercept_</code></h1>
+
+
+<h2><code>coef_</code></h2>
+
+
+<p>Represents the <strong>slope</strong> of the regression line.</p>
+
+
+<p>It tells us how much the predicted output changes when the input increases by one unit.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-python"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>coef_<span class="token punctuation">)</span></code></pre>
+
+<p>Output:</p>
+
+
+<pre class="language-text"><code class="language-text">[10.]</code></pre>
+
+<p>Meaning:</p>
+
+
+<p>Every extra hour studied increases the predicted marks by <strong>10</strong>.</p>
+
+
+<hr>
+
+
+<h2><code>intercept_</code></h2>
+
+
+<p>Represents the predicted output when the input is <strong>0</strong>.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-python"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>intercept_<span class="token punctuation">)</span></code></pre>
+
+<p>Output:</p>
+
+
+<pre class="language-text"><code class="language-text">5.0</code></pre>
+
+<p>Meaning:</p>
+
+
+<p>If a student studies <strong>0 hours</strong>, the predicted marks are <strong>5</strong>.</p>
+
+
+<hr>
+
+
+<h1>7. How Linear Regression Works</h1>
+
+
+<p>Suppose we have this dataset:</p>
+
+
+<table>
+<thead>
+<tr>
+<th align="right">Hours</th>
+<th align="right">Marks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">1</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">20</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right">30</td>
+</tr>
+</tbody></table>
+
+
+<p>Initially, the model doesn&#39;t know the relationship.</p>
+
+
+<p>It starts with a random line, for example:</p>
+
+
+<pre class="language-text"><code class="language-text">Marks = 4 × Hours + 8</code></pre>
+
+<p>Predictions:</p>
+
+
+<table>
+<thead>
+<tr>
+<th align="right">Hours</th>
+<th align="right">Actual</th>
+<th align="right">Predicted</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">1</td>
+<td align="right">10</td>
+<td align="right">12</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">16</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right">30</td>
+<td align="right">20</td>
+</tr>
+</tbody></table>
+
+
+<p>The predictions contain errors.</p>
+
+
+<p>The model calculates these errors and repeatedly adjusts the slope and intercept until it finds the line that minimizes the prediction error.</p>
+
+
+<hr>
+
+
+<h1>8. Cost Function (Concept)</h1>
+
+
+<p>The <strong>Cost Function</strong> measures how far the model&#39;s predictions are from the actual values.</p>
+
+
+<ul>
+<li>High Cost → Poor predictions</li>
+<li>Low Cost → Better predictions</li>
+</ul>
+
+
+<p>The objective of Linear Regression is to <strong>minimize the cost function</strong>.</p>
+
+
+<p><strong>Interview Note:</strong> For campus placements, understanding the concept is sufficient. You don&#39;t need to derive the formula.</p>
+
+
+<hr>
+
+
+<h1>9. Model Training</h1>
+
+
+<p>Training is done using:</p>
+
+
+<pre class="language-python"><code class="language-python">model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span></code></pre>
+
+<p>What happens internally?</p>
+
+
+<ul>
+<li>The model analyzes the training data.</li>
+<li>It learns the relationship between the features and the target.</li>
+<li>It finds the best values for the slope (<code>coef_</code>) and intercept (<code>intercept_</code>) that minimize prediction error.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>10. Prediction</h1>
+
+
+<p>After training:</p>
+
+
+<pre class="language-python"><code class="language-python">model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+
+<p>The model uses the learned equation to predict the output for unseen data.</p>
+
+
+<hr>
+
+
+<h1>11. Assumptions of Linear Regression</h1>
+
+
+<ol>
+<li><p><strong>Linear Relationship</strong>
+The relationship between input and output should be approximately linear.</p>
+</li>
+<li><p><strong>Independent Observations</strong>
+One data point should not depend on another.</p>
+</li>
+<li><p><strong>No Extreme Outliers</strong>
+Large outliers can distort the regression line.</p>
+</li>
+<li><p><strong>Low Multicollinearity</strong>
+Input features should not be highly correlated with each other.</p>
+</li>
+<li><p><strong>Normally Distributed Errors</strong>
+The prediction errors should be approximately normally distributed.</p>
+</li>
+</ol>
+
+
+<hr>
+
+
+<h1>12. Advantages</h1>
+
+
+<ul>
+<li>Easy to understand and implement.</li>
+<li>Fast to train.</li>
+<li>Highly interpretable.</li>
+<li>Works well for linear relationships.</li>
+<li>Baseline algorithm for many regression problems.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>13. Limitations</h1>
+
+
+<ul>
+<li>Assumes a linear relationship.</li>
+<li>Sensitive to outliers.</li>
+<li>Performs poorly on complex non-linear data.</li>
+<li>Not suitable for classification problems.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>14. Scikit-Learn Implementation</h1>
+
+
+<pre class="language-python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> LinearRegression
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+X <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+y <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">40</span><span class="token punctuation">,</span> <span class="token number">60</span><span class="token punctuation">,</span> <span class="token number">80</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+model <span class="token operator">=</span> LinearRegression<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Coefficient:"</span><span class="token punctuation">,</span> model<span class="token punctuation">.</span>coef_<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Intercept:"</span><span class="token punctuation">,</span> model<span class="token punctuation">.</span>intercept_<span class="token punctuation">)</span>
+
+prediction <span class="token operator">=</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">12</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Prediction:"</span><span class="token punctuation">,</span> prediction<span class="token punctuation">)</span></code></pre>
+
+<hr>
+
+
+<h1>🎯 Top 10 Interview Questions with Answers</h1>
+
+
+<h2>1. What is Linear Regression?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Linear Regression is a supervised machine learning algorithm used to predict continuous numerical values by learning the best-fit linear relationship between the input features and the target variable.</p>
+
+
+<hr>
+
+
+<h2>2. Why is it called Linear Regression?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>It is called Linear Regression because it assumes there is an approximately linear (straight-line) relationship between the input features and the target variable and models this relationship using the best-fit line.</p>
+
+
+<hr>
+
+
+<h2>3. When should we use Linear Regression?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Linear Regression should be used when the target variable is continuous and there is an approximately linear relationship between the input features and the target.</p>
+
+
+<p>Examples include predicting house prices, salaries, and temperatures.</p>
+
+
+<hr>
+
+
+<h2>4. What is the difference between Simple and Multiple Linear Regression?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Simple Linear Regression uses one input feature to predict the target variable, whereas Multiple Linear Regression uses two or more input features.</p>
+
+
+<hr>
+
+
+<h2>5. What does <code>model.fit(X, y)</code> do?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p><code>model.fit(X, y)</code> trains the model using the training data. It learns the best-fit relationship by finding the optimal values of the coefficient (<code>coef_</code>) and intercept (<code>intercept_</code>) that minimize prediction error.</p>
+
+
+<hr>
+
+
+<h2>6. What is <code>coef_</code>?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p><code>coef_</code> is the slope of the regression line. It indicates how much the predicted output changes for a one-unit increase in the input feature.</p>
+
+
+<hr>
+
+
+<h2>7. What is <code>intercept_</code>?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p><code>intercept_</code> is the predicted value of the target variable when all input features are zero.</p>
+
+
+<hr>
+
+
+<h2>8. What are the assumptions of Linear Regression?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<ul>
+<li>Linear relationship</li>
+<li>Independent observations</li>
+<li>No extreme outliers</li>
+<li>Low multicollinearity</li>
+<li>Normally distributed errors</li>
+</ul>
+
+
+<hr>
+
+
+<h2>9. Why can&#39;t Linear Regression be used for classification?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Linear Regression predicts continuous numerical values and can produce outputs outside the valid range of class labels (for example, values less than 0 or greater than 1). Classification problems require predicting categories, so algorithms like Logistic Regression are more appropriate.</p>
+
+
+<hr>
+
+
+<h2>10. What are the advantages and limitations of Linear Regression?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p><strong>Advantages:</strong></p>
+
+
+<ul>
+<li>Simple and easy to interpret.</li>
+<li>Fast to train.</li>
+<li>Works well for linear relationships.</li>
+</ul>
+
+
+<p><strong>Limitations:</strong></p>
+
+
+<ul>
+<li>Assumes a linear relationship.</li>
+<li>Sensitive to outliers.</li>
+<li>Not suitable for non-linear data or classification tasks.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>📝 Quick Revision (2-Minute Recap)</h1>
+
+
+<ul>
+<li><strong>Linear Regression</strong> predicts <strong>continuous numerical values</strong>.</li>
+<li>It is a <strong>supervised learning algorithm</strong>.</li>
+<li>It learns the <strong>best-fit straight line</strong> between inputs and outputs.</li>
+<li><code>coef_</code> = <strong>Slope</strong> (change in output per unit change in input).</li>
+<li><code>intercept_</code> = <strong>Predicted output when input is 0</strong>.</li>
+<li><code>model.fit(X, y)</code> trains the model by learning the optimal slope and intercept.</li>
+<li><code>model.predict()</code> uses the learned relationship to make predictions on new data.</li>
+<li>Use Linear Regression <strong>only for regression problems</strong>, not for classification.</li>
+<li>The model aims to <strong>minimize prediction error</strong> using a cost function.</li>
+<li>Remember the five assumptions: <strong>Linearity, Independence, No extreme outliers, Low multicollinearity, and Normally distributed errors.</strong></li>
+</ul>
+
+
+<p>These notes are sufficient for <strong>campus placement interviews</strong> and cover the concepts interviewers most commonly expect for Linear Regression.</p>
+</article></main>
+</body>
+</html>
