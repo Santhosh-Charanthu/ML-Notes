@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>📘 Day 4: Logistic Regression (Interview Ready)</title>
+<style>
+:root{color-scheme:light;--fg:#0f172a;--muted:#64748b;--border:#e2e8f0;--accent:#0284c7;--accent-soft:#e0f2fe;--card:#ffffff;--code-bg:#0f172a;--code-fg:#e2e8f0;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:linear-gradient(180deg,#e0f2fe 0%,#f0f9ff 60%,#ffffff 100%);color:var(--fg);min-height:100vh;padding:32px 16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.page{max-width:920px;margin:0 auto}
+.doc{background:var(--card);border-radius:18px;box-shadow:0 20px 60px -20px rgba(2,132,199,.25),0 4px 14px -4px rgba(15,23,42,.08);padding:clamp(24px,5vw,60px);border:1px solid rgba(148,163,184,.2)}
+.title-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin:0 0 1.2em;padding-bottom:.5em;border-bottom:1px solid var(--border)}
+.title-row h1{margin:0;padding:0;border:0;flex:1 1 auto;min-width:0}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;border:1px solid rgba(2,132,199,.2);white-space:nowrap;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;box-shadow:0 1px 2px rgba(2,132,199,.08);flex:0 0 auto;margin-left:auto;margin-right:8px}
+.badge:hover{background:#bae6fd;transform:translateY(-1px);box-shadow:0 6px 16px -6px rgba(2,132,199,.35)}
+h1,h2,h3,h4,h5,h6{font-weight:700;line-height:1.25;margin:1.8em 0 .6em;letter-spacing:-.01em}
+h1{font-size:2.15rem;border-bottom:1px solid var(--border);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.6rem}
+h3{font-size:1.3rem}
+h4{font-size:1.1rem}
+p{margin:.9em 0}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+strong{font-weight:700}
+del{color:var(--muted)}
+ul,ol{margin:.8em 0;padding-left:1.6em}
+li{margin:.25em 0}
+blockquote{margin:1.2em 0;padding:.5em 1.1em;border-left:4px solid var(--accent);background:var(--accent-soft);color:#334155;border-radius:0 .5rem .5rem 0}
+hr{margin:2em 0;border:0;border-top:1px solid var(--border)}
+img{max-width:100%;border-radius:.5rem;margin:1em 0}
+code{font-family:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.9em;padding:.15em .4em;background:#f1f5f9;color:#0c4a6e;border-radius:.35rem;border:1px solid var(--border)}
+pre{margin:1.2em 0;padding:1rem 1.1rem;background:var(--code-bg);color:var(--code-fg);border-radius:.7rem;overflow-x:auto;font-size:.9rem;line-height:1.55;border:1px solid #1e293b}
+pre code{background:transparent;border:0;padding:0;color:inherit;font-size:inherit}
+table{width:100%;border-collapse:collapse;margin:1.2em 0;display:block;overflow-x:auto;border:1px solid var(--border);border-radius:.6rem}
+thead{background:var(--accent-soft)}
+th,td{padding:.65em .9em;border-bottom:1px solid var(--border);text-align:left}
+th{font-weight:600}
+tr:last-child td{border-bottom:0}
+.callout{margin:1.5em 0;padding:1rem 1.1rem;border-radius:.8rem;border:1px solid var(--co-b,var(--border));background:var(--co-bg,#f8fafc);box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.callout-title{display:flex;align-items:center;gap:.55rem;font-weight:700;font-size:1rem;margin-bottom:.5rem;color:var(--co-fg,var(--fg))}
+.callout-icon{font-size:1.15rem;line-height:1}
+.callout-body>:first-child{margin-top:0}
+.callout-body>:last-child{margin-bottom:0}
+.callout-note{--co-bg:#eff6ff;--co-b:#bfdbfe;--co-fg:#1e40af}
+.callout-important{--co-bg:#faf5ff;--co-b:#e9d5ff;--co-fg:#6b21a8}
+.callout-warning{--co-bg:#fffbeb;--co-b:#fde68a;--co-fg:#92400e}
+.callout-tip{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-question{--co-bg:#ecfeff;--co-b:#a5f3fc;--co-fg:#155e75}
+.callout-observation{--co-bg:#f0fdfa;--co-b:#99f6e4;--co-fg:#115e59}
+.callout-complexity{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.callout-summary{--co-bg:#eef2ff;--co-b:#c7d2fe;--co-fg:#3730a3}
+.callout-advantage{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-disadvantage{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#94a3b8}
+.token.punctuation{color:#cbd5e1}
+.token.property,.token.tag,.token.constant,.token.symbol,.token.deleted{color:#fca5a5}
+.token.boolean,.token.number{color:#fdba74}
+.token.selector,.token.attr-name,.token.string,.token.char,.token.builtin,.token.inserted{color:#86efac}
+.token.operator,.token.entity,.token.url,.token.variable{color:#7dd3fc}
+.token.atrule,.token.attr-value,.token.function,.token.class-name{color:#f0abfc}
+.token.keyword{color:#c4b5fd}
+.token.regex,.token.important{color:#fcd34d}
+@media (max-width:640px){body{padding:12px 8px}.doc{padding:20px 16px;border-radius:12px}h1{font-size:1.7rem}.title-row{align-items:flex-start}.badge{font-size:12px;padding:5px 10px}}
+@media print{body{background:#fff;padding:0}.doc{box-shadow:none;border:0;padding:0;max-width:none}}
+</style>
+</head>
+<body>
+<main class="page"><article class="doc"><p>Perfect! Since our goal is <strong>placement preparation</strong>, the next logical topic is <strong>Logistic Regression</strong>.</p>
+
+
+<blockquote>
+<p>💡 <strong>Interview Insight:</strong> Logistic Regression is one of the <strong>most frequently asked ML algorithms</strong> in campus placements. Almost every ML interview asks:</p>
+<ul>
+<li>What is Logistic Regression?</li>
+<li>Why is it called regression if it&#39;s used for classification?</li>
+<li>Difference between Linear Regression and Logistic Regression?</li>
+<li>What is the Sigmoid Function?</li>
+<li>Why can&#39;t we use Linear Regression for classification?</li>
+</ul>
+</blockquote>
+
+
+<p>We&#39;ll cover all of these.</p>
+
+
+<hr>
+
+
+<h1>📘 Day 4: Logistic Regression (Interview Ready)</h1>
+
+
+<h2>🎯 Learning Objectives</h2>
+
+
+<p>By the end of this lesson, you should be able to:</p>
+
+
+<ul>
+<li>Explain what Logistic Regression is.</li>
+<li>Understand why it&#39;s called &quot;Regression&quot;.</li>
+<li>Know why Linear Regression cannot solve classification problems.</li>
+<li>Understand the Sigmoid Function.</li>
+<li>Learn how predictions are made.</li>
+<li>Implement Logistic Regression using Scikit-Learn.</li>
+<li>Answer the top interview questions confidently.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>1. What is Logistic Regression?</h1>
+
+
+<p>Logistic Regression is a <strong>supervised machine learning algorithm</strong> used for <strong>classification problems</strong>.</p>
+
+
+<p>Unlike Linear Regression, which predicts <strong>continuous values</strong>, Logistic Regression predicts <strong>categories (classes)</strong>.</p>
+
+
+<h3>Examples</h3>
+
+
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Spam Detection</td>
+<td>Spam / Not Spam</td>
+</tr>
+<tr>
+<td>Disease Prediction</td>
+<td>Yes / No</td>
+</tr>
+<tr>
+<td>Student Pass Prediction</td>
+<td>Pass / Fail</td>
+</tr>
+<tr>
+<td>Loan Approval</td>
+<td>Approved / Rejected</td>
+</tr>
+<tr>
+<td>Fraud Detection</td>
+<td>Fraud / Genuine</td>
+</tr>
+</tbody></table>
+
+
+<p>Notice that all outputs are <strong>categories</strong>, not numbers like salary or house price.</p>
+
+
+<hr>
+
+
+<h1>2. Why Can&#39;t We Use Linear Regression for Classification?</h1>
+
+
+<p>Let&#39;s say we&#39;re predicting whether a student passes.</p>
+
+
+<p>We assign:</p>
+
+
+<ul>
+<li>Pass = 1</li>
+<li>Fail = 0</li>
+</ul>
+
+
+<p>Using Linear Regression, the model might predict:</p>
+
+
+<pre class="language-text"><code class="language-text">-0.5
+1.7
+2.3</code></pre>
+
+<p>These are <strong>not valid probabilities or class labels</strong>.</p>
+
+
+<p>For classification, we need outputs between:</p>
+
+
+<pre class="language-text"><code class="language-text">0 and 1</code></pre>
+
+<p>That&#39;s why Linear Regression isn&#39;t suitable for classification.</p>
+
+
+<hr>
+
+
+<h1>3. Why is it Called &quot;Regression&quot;?</h1>
+
+
+<p>This confuses many beginners.</p>
+
+
+<p>Although Logistic Regression is used for <strong>classification</strong>, it performs regression internally to estimate a score, then converts that score into a probability using the <strong>Sigmoid Function</strong>.</p>
+
+
+<p>So the name &quot;Regression&quot; comes from the mathematical model it uses internally, while the final output is used for classification.</p>
+
+
+<p>This is a very common interview question.</p>
+
+
+<hr>
+
+
+<h1>4. The Sigmoid Function</h1>
+
+
+<p>The Sigmoid Function converts any real number into a value between <strong>0 and 1</strong>.</p>
+
+
+<p>It is defined as:</p>
+
+
+<p>You do <strong>not</strong> need to memorize the formula for campus placements.</p>
+
+
+<p>Just remember:</p>
+
+
+<ul>
+<li>Input: Any real number (positive or negative)</li>
+<li>Output: A probability between 0 and 1</li>
+</ul>
+
+
+<h3>Examples</h3>
+
+
+<table>
+<thead>
+<tr>
+<th align="right">Input</th>
+<th align="right">Sigmoid Output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">-10</td>
+<td align="right">~0.00</td>
+</tr>
+<tr>
+<td align="right">0</td>
+<td align="right">0.50</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">~0.88</td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td align="right">~1.00</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h1>5. How Does Logistic Regression Predict?</h1>
+
+
+<p>Suppose we&#39;re predicting whether a student passes.</p>
+
+
+<p>After applying the Sigmoid Function, the model outputs:</p>
+
+
+<pre class="language-text"><code class="language-text">0.85</code></pre>
+
+<p>Interpretation:</p>
+
+
+<blockquote>
+<p>There is an 85% probability that the student will pass.</p>
+</blockquote>
+
+
+<p>Now we apply a <strong>decision threshold</strong> (usually 0.5).</p>
+
+
+<table>
+<thead>
+<tr>
+<th align="right">Probability</th>
+<th>Prediction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">≥ 0.5</td>
+<td>Class 1 (Pass)</td>
+</tr>
+<tr>
+<td align="right">&lt; 0.5</td>
+<td>Class 0 (Fail)</td>
+</tr>
+</tbody></table>
+
+
+<p>Example:</p>
+
+
+<ul>
+<li>0.82 → Pass</li>
+<li>0.73 → Pass</li>
+<li>0.40 → Fail</li>
+<li>0.12 → Fail</li>
+</ul>
+
+
+<hr>
+
+
+<h1>6. Linear Regression vs Logistic Regression</h1>
+
+
+<table>
+<thead>
+<tr>
+<th>Linear Regression</th>
+<th>Logistic Regression</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Regression algorithm</td>
+<td>Classification algorithm</td>
+</tr>
+<tr>
+<td>Predicts continuous values</td>
+<td>Predicts categories</td>
+</tr>
+<tr>
+<td>Output can be any real number</td>
+<td>Output is a probability (0 to 1)</td>
+</tr>
+<tr>
+<td>Best-fit straight line</td>
+<td>Sigmoid curve</td>
+</tr>
+<tr>
+<td>Used for house price, salary</td>
+<td>Used for spam detection, disease prediction</td>
+</tr>
+</tbody></table>
+
+
+<p>This comparison is asked in almost every fresher interview.</p>
+
+
+<hr>
+
+
+<h1>7. Training the Model</h1>
+
+
+<pre class="language-python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> LogisticRegression
+
+model <span class="token operator">=</span> LogisticRegression<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span></code></pre>
+
+<p>Just like Linear Regression:</p>
+
+
+<ul>
+<li><code>fit()</code> trains the model.</li>
+<li>It learns the relationship between features and labels.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>8. Making Predictions</h1>
+
+
+<pre class="language-python"><code class="language-python">predictions <span class="token operator">=</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X_test<span class="token punctuation">)</span></code></pre>
+
+<p>This returns class labels such as:</p>
+
+
+<pre class="language-text"><code class="language-text">[1, 0, 1, 1, 0]</code></pre>
+
+<p>If you want the probabilities instead:</p>
+
+
+<pre class="language-python"><code class="language-python">probabilities <span class="token operator">=</span> model<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>X_test<span class="token punctuation">)</span></code></pre>
+
+<p>Example output:</p>
+
+
+<pre class="language-text"><code class="language-text">[[0.90, 0.10],
+ [0.25, 0.75]]</code></pre>
+
+<p>For the first sample:</p>
+
+
+<ul>
+<li>90% probability of Class 0</li>
+<li>10% probability of Class 1</li>
+</ul>
+
+
+<hr>
+
+
+<h1>9. Real-World Example</h1>
+
+
+<p>Suppose we want to predict whether a student passes based on hours studied.</p>
+
+
+<table>
+<thead>
+<tr>
+<th align="right">Hours Studied</th>
+<th align="right">Pass</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="right">1</td>
+</tr>
+</tbody></table>
+
+
+<p>Here:</p>
+
+
+<ul>
+<li>Feature: Hours Studied</li>
+<li>Label: Pass (0/1)</li>
+</ul>
+
+
+<p>Logistic Regression learns from this data and predicts the probability of passing for new students.</p>
+
+
+<hr>
+
+
+<h1>10. Advantages</h1>
+
+
+<ul>
+<li>Simple and fast.</li>
+<li>Easy to interpret.</li>
+<li>Works well for binary classification.</li>
+<li>Outputs probabilities.</li>
+<li>Performs well on linearly separable data.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>11. Limitations</h1>
+
+
+<ul>
+<li>Assumes a linear relationship between features and the <strong>log-odds</strong> of the target.</li>
+<li>Not suitable for highly complex non-linear relationships.</li>
+<li>Sensitive to outliers and irrelevant features.</li>
+</ul>
+
+
+<p>For placements, it&#39;s enough to remember that Logistic Regression works best when the relationship is reasonably simple.</p>
+
+
+<hr>
+
+
+<h1>💻 Hands-On Activity</h1>
+
+
+<pre class="language-python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> LogisticRegression
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>datasets <span class="token keyword">import</span> load_iris
+
+iris <span class="token operator">=</span> load_iris<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+X <span class="token operator">=</span> iris<span class="token punctuation">.</span>data
+y <span class="token operator">=</span> iris<span class="token punctuation">.</span>target
+
+model <span class="token operator">=</span> LogisticRegression<span class="token punctuation">(</span>max_iter<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span><span class="token punctuation">[</span>X<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span><span class="token punctuation">[</span>X<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+
+<h3>Your Tasks</h3>
+
+
+<ol>
+<li>Run the code.</li>
+<li>Observe the predicted class.</li>
+<li>Observe the predicted probabilities.</li>
+<li>Explain what <code>predict()</code> and <code>predict_proba()</code> return.</li>
+</ol>
+
+
+<hr>
+
+
+<h1>🎤 Top 5 Interview Questions</h1>
+
+
+<h2>1. What is Logistic Regression?</h2>
+
+
+<hr>
+
+
+<h2>2. Why is Logistic Regression used for classification even though its name contains &quot;Regression&quot;?</h2>
+
+
+<hr>
+
+
+<h2>3. Why can&#39;t Linear Regression be used for classification?</h2>
+
+
+<hr>
+
+
+<h2>4. What is the purpose of the Sigmoid Function?</h2>
+
+
+<hr>
+
+
+<h2>5. What is the difference between <code>predict()</code> and <code>predict_proba()</code>?</h2>
+
+
+<hr>
+
+
+<h3>📝 Assignment</h3>
+
+
+<p>Reply with:</p>
+
+
+<ol>
+<li>Your answers to the <strong>Top 5 interview questions</strong>.</li>
+<li>The output of the coding activity.</li>
+<li>Any concept that feels confusing.</li>
+</ol>
+
+
+<p>I&#39;ll review your answers like an interviewer, and then we&#39;ll move to <strong>Decision Trees</strong>, another algorithm that&#39;s very popular in campus placements.</p>
+</article></main>
+</body>
+</html>
