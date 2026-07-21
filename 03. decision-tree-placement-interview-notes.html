@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>📘 Day 5 Notes – Decision Tree (Placement Interview Notes)</title>
+<style>
+:root{color-scheme:light;--fg:#0f172a;--muted:#64748b;--border:#e2e8f0;--accent:#0284c7;--accent-soft:#e0f2fe;--card:#ffffff;--code-bg:#0f172a;--code-fg:#e2e8f0;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:linear-gradient(180deg,#e0f2fe 0%,#f0f9ff 60%,#ffffff 100%);color:var(--fg);min-height:100vh;padding:32px 16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.page{max-width:920px;margin:0 auto}
+.doc{background:var(--card);border-radius:18px;box-shadow:0 20px 60px -20px rgba(2,132,199,.25),0 4px 14px -4px rgba(15,23,42,.08);padding:clamp(24px,5vw,60px);border:1px solid rgba(148,163,184,.2)}
+.title-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin:0 0 1.2em;padding-bottom:.5em;border-bottom:1px solid var(--border)}
+.title-row h1{margin:0;padding:0;border:0;flex:1 1 auto;min-width:0}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;border:1px solid rgba(2,132,199,.2);white-space:nowrap;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;box-shadow:0 1px 2px rgba(2,132,199,.08);flex:0 0 auto;margin-left:auto;margin-right:8px}
+.badge:hover{background:#bae6fd;transform:translateY(-1px);box-shadow:0 6px 16px -6px rgba(2,132,199,.35)}
+h1,h2,h3,h4,h5,h6{font-weight:700;line-height:1.25;margin:1.8em 0 .6em;letter-spacing:-.01em}
+h1{font-size:2.15rem;border-bottom:1px solid var(--border);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.6rem}
+h3{font-size:1.3rem}
+h4{font-size:1.1rem}
+p{margin:.9em 0}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+strong{font-weight:700}
+del{color:var(--muted)}
+ul,ol{margin:.8em 0;padding-left:1.6em}
+li{margin:.25em 0}
+blockquote{margin:1.2em 0;padding:.5em 1.1em;border-left:4px solid var(--accent);background:var(--accent-soft);color:#334155;border-radius:0 .5rem .5rem 0}
+hr{margin:2em 0;border:0;border-top:1px solid var(--border)}
+img{max-width:100%;border-radius:.5rem;margin:1em 0}
+code{font-family:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.9em;padding:.15em .4em;background:#f1f5f9;color:#0c4a6e;border-radius:.35rem;border:1px solid var(--border)}
+pre{margin:1.2em 0;padding:1rem 1.1rem;background:var(--code-bg);color:var(--code-fg);border-radius:.7rem;overflow-x:auto;font-size:.9rem;line-height:1.55;border:1px solid #1e293b}
+pre code{background:transparent;border:0;padding:0;color:inherit;font-size:inherit}
+table{width:100%;border-collapse:collapse;margin:1.2em 0;display:block;overflow-x:auto;border:1px solid var(--border);border-radius:.6rem}
+thead{background:var(--accent-soft)}
+th,td{padding:.65em .9em;border-bottom:1px solid var(--border);text-align:left}
+th{font-weight:600}
+tr:last-child td{border-bottom:0}
+.callout{margin:1.5em 0;padding:1rem 1.1rem;border-radius:.8rem;border:1px solid var(--co-b,var(--border));background:var(--co-bg,#f8fafc);box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.callout-title{display:flex;align-items:center;gap:.55rem;font-weight:700;font-size:1rem;margin-bottom:.5rem;color:var(--co-fg,var(--fg))}
+.callout-icon{font-size:1.15rem;line-height:1}
+.callout-body>:first-child{margin-top:0}
+.callout-body>:last-child{margin-bottom:0}
+.callout-note{--co-bg:#eff6ff;--co-b:#bfdbfe;--co-fg:#1e40af}
+.callout-important{--co-bg:#faf5ff;--co-b:#e9d5ff;--co-fg:#6b21a8}
+.callout-warning{--co-bg:#fffbeb;--co-b:#fde68a;--co-fg:#92400e}
+.callout-tip{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-question{--co-bg:#ecfeff;--co-b:#a5f3fc;--co-fg:#155e75}
+.callout-observation{--co-bg:#f0fdfa;--co-b:#99f6e4;--co-fg:#115e59}
+.callout-complexity{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.callout-summary{--co-bg:#eef2ff;--co-b:#c7d2fe;--co-fg:#3730a3}
+.callout-advantage{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-disadvantage{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#94a3b8}
+.token.punctuation{color:#cbd5e1}
+.token.property,.token.tag,.token.constant,.token.symbol,.token.deleted{color:#fca5a5}
+.token.boolean,.token.number{color:#fdba74}
+.token.selector,.token.attr-name,.token.string,.token.char,.token.builtin,.token.inserted{color:#86efac}
+.token.operator,.token.entity,.token.url,.token.variable{color:#7dd3fc}
+.token.atrule,.token.attr-value,.token.function,.token.class-name{color:#f0abfc}
+.token.keyword{color:#c4b5fd}
+.token.regex,.token.important{color:#fcd34d}
+@media (max-width:640px){body{padding:12px 8px}.doc{padding:20px 16px;border-radius:12px}h1{font-size:1.7rem}.title-row{align-items:flex-start}.badge{font-size:12px;padding:5px 10px}}
+@media print{body{background:#fff;padding:0}.doc{box-shadow:none;border:0;padding:0;max-width:none}}
+</style>
+</head>
+<body>
+<main class="page"><article class="doc"><h1>📘 Day 5 Notes – Decision Tree (Placement Interview Notes)</h1>
+
+
+<blockquote>
+<p><strong>Goal:</strong> By the end of this topic, you should be able to explain Decision Trees confidently in campus interviews, understand how they work, know their advantages and limitations, and implement them using Scikit-Learn.</p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>Table of Contents</h1>
+
+
+<ol>
+<li>What is a Decision Tree?</li>
+<li>Why is it called a Decision Tree?</li>
+<li>Components of a Decision Tree</li>
+<li>How a Decision Tree Works</li>
+<li>How does it choose the best split?</li>
+<li>Gini Index</li>
+<li>Entropy &amp; Information Gain</li>
+<li>Decision Tree for Classification &amp; Regression</li>
+<li>Overfitting</li>
+<li>How to Reduce Overfitting</li>
+<li>Advantages</li>
+<li>Limitations</li>
+<li>Scikit-Learn Implementation</li>
+<li>Top 10 Interview Questions</li>
+</ol>
+
+
+<hr>
+
+
+<h1>1. What is a Decision Tree?</h1>
+
+
+<p>A Decision Tree is a <strong>supervised machine learning algorithm</strong> used for both <strong>classification</strong> and <strong>regression</strong> problems.</p>
+
+
+<p>It predicts the output by repeatedly splitting the dataset into smaller groups based on the feature that best separates the data.</p>
+
+
+<h3>Interview Definition</h3>
+
+
+<blockquote>
+<p>A Decision Tree is a supervised machine learning algorithm that predicts the output by recursively splitting the data based on the feature that best separates the data into more homogeneous groups.</p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>2. Why is it Called a Decision Tree?</h1>
+
+
+<p>It is called a <strong>Decision Tree</strong> because the model makes decisions in a <strong>tree-like structure</strong>.</p>
+
+
+<p>It starts from the <strong>root node</strong>, asks questions, creates <strong>branches</strong>, and ends at a <strong>leaf node</strong>, which contains the final prediction.</p>
+
+
+<h3>Example</h3>
+
+
+<pre class="language-text"><code class="language-text">                    Age &lt; 30?
+                   /         \
+                Yes           No
+               /               \
+      Income > 50K?          Buy = Yes
+         /      \
+      Yes       No
+      Buy    Don't Buy</code></pre>
+
+<hr>
+
+
+<h1>3. Components of a Decision Tree</h1>
+
+
+<h2>Root Node</h2>
+
+
+<p>The first decision made by the tree.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">Age &lt; 30?</code></pre>
+
+<hr>
+
+
+<h2>Internal Node</h2>
+
+
+<p>Intermediate decision points.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">Income > 50K?</code></pre>
+
+<hr>
+
+
+<h2>Branch</h2>
+
+
+<p>Represents the outcome of a decision.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">Yes
+No</code></pre>
+
+<hr>
+
+
+<h2>Leaf Node</h2>
+
+
+<p>The final prediction.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">Buy Laptop
+
+or
+
+Don't Buy Laptop</code></pre>
+
+<hr>
+
+
+<h1>4. How Does a Decision Tree Work?</h1>
+
+
+<p>Suppose we have the following dataset:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Age</th>
+<th>Income</th>
+<th>Buy Laptop</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>22</td>
+<td>40K</td>
+<td>No</td>
+</tr>
+<tr>
+<td>25</td>
+<td>80K</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>45</td>
+<td>90K</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>35</td>
+<td>35K</td>
+<td>No</td>
+</tr>
+</tbody></table>
+
+
+<p>The Decision Tree asks:</p>
+
+
+<blockquote>
+<p>Which feature best separates the data?</p>
+</blockquote>
+
+
+<p>Possible choices:</p>
+
+
+<ul>
+<li>Age</li>
+<li>Income</li>
+</ul>
+
+
+<p>It selects the feature that creates the <strong>purest groups</strong> and repeats the process recursively until a stopping condition is reached.</p>
+
+
+<hr>
+
+
+<h1>5. How Does It Choose the Best Split?</h1>
+
+
+<p>The tree evaluates every possible split using impurity measures.</p>
+
+
+<p>The two most common impurity measures are:</p>
+
+
+<ul>
+<li>Gini Index</li>
+<li>Entropy (Information Gain)</li>
+</ul>
+
+
+<p>The best split is the one that creates the <strong>purest child nodes</strong>.</p>
+
+
+<hr>
+
+
+<h1>6. Gini Index</h1>
+
+
+<p>The <strong>Gini Index</strong> measures how mixed the classes are within a node.</p>
+
+
+<ul>
+<li>Low Gini → Pure node</li>
+<li>High Gini → Mixed node</li>
+</ul>
+
+
+<h3>Example</h3>
+
+
+<p>Node A:</p>
+
+
+<pre class="language-text"><code class="language-text">Cat
+Cat
+Cat</code></pre>
+
+<p>Gini = Low</p>
+
+
+<hr>
+
+
+<p>Node B:</p>
+
+
+<pre class="language-text"><code class="language-text">Cat
+Dog
+Cat
+Dog</code></pre>
+
+<p>Gini = High</p>
+
+
+<h3>Interview Definition</h3>
+
+
+<blockquote>
+<p>Gini Index is an impurity measure used by Decision Trees. The algorithm chooses the split with the lowest Gini impurity.</p>
+</blockquote>
+
+
+<h3>Important Note</h3>
+
+
+<p>Scikit-Learn uses <strong>Gini Index by default</strong>.</p>
+
+
+<hr>
+
+
+<h1>7. Entropy &amp; Information Gain</h1>
+
+
+<p>Entropy also measures impurity.</p>
+
+
+<ul>
+<li>Low Entropy → Pure node</li>
+<li>High Entropy → Mixed node</li>
+</ul>
+
+
+<p>The Decision Tree chooses the split with the <strong>highest Information Gain</strong>, which means the largest reduction in entropy.</p>
+
+
+<h3>Interview Definition</h3>
+
+
+<blockquote>
+<p>Entropy measures impurity, while Information Gain measures how much impurity is reduced after a split. The Decision Tree chooses the split with the highest Information Gain.</p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>Gini vs Entropy</h1>
+
+
+<table>
+<thead>
+<tr>
+<th>Gini Index</th>
+<th>Entropy</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Measures impurity</td>
+<td>Measures impurity</td>
+</tr>
+<tr>
+<td>Faster to compute</td>
+<td>Slightly slower</td>
+</tr>
+<tr>
+<td>Default in Scikit-Learn</td>
+<td>Used with <code>criterion=&quot;entropy&quot;</code></td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h1>8. Decision Tree for Classification &amp; Regression</h1>
+
+
+<h2>Classification</h2>
+
+
+<p>Predicts categories.</p>
+
+
+<p>Examples:</p>
+
+
+<ul>
+<li>Spam / Not Spam</li>
+<li>Pass / Fail</li>
+<li>Disease / No Disease</li>
+</ul>
+
+
+<hr>
+
+
+<h2>Regression</h2>
+
+
+<p>Predicts continuous values.</p>
+
+
+<p>Examples:</p>
+
+
+<ul>
+<li>House Price</li>
+<li>Salary</li>
+<li>Temperature</li>
+</ul>
+
+
+<p>In regression, each leaf node stores a numerical prediction instead of a class.</p>
+
+
+<hr>
+
+
+<h1>9. Overfitting</h1>
+
+
+<p>Overfitting occurs when the Decision Tree becomes too complex and memorizes the training data instead of learning general patterns.</p>
+
+
+<h3>Symptoms</h3>
+
+
+<ul>
+<li>Very high training accuracy.</li>
+<li>Low testing accuracy.</li>
+</ul>
+
+
+<h3>Example</h3>
+
+
+<p>A very deep tree may create separate branches for a few unusual data points, reducing its ability to generalize to new data.</p>
+
+
+<hr>
+
+
+<h1>10. How to Reduce Overfitting</h1>
+
+
+<p>Common techniques include:</p>
+
+
+<h3>1. Limit Tree Depth</h3>
+
+
+<pre class="language-python"><code class="language-python">max_depth<span class="token operator">=</span><span class="token number">3</span></code></pre>
+
+<p>This prevents the tree from becoming too deep.</p>
+
+
+<hr>
+
+
+<h3>2. Increase Minimum Samples Required to Split</h3>
+
+
+<pre class="language-python"><code class="language-python">min_samples_split<span class="token operator">=</span><span class="token number">5</span></code></pre>
+
+<p>This prevents unnecessary splits.</p>
+
+
+<hr>
+
+
+<h3>3. Increase Minimum Samples per Leaf</h3>
+
+
+<pre class="language-python"><code class="language-python">min_samples_leaf<span class="token operator">=</span><span class="token number">2</span></code></pre>
+
+<p>This ensures each leaf contains enough data.</p>
+
+
+<hr>
+
+
+<h3>4. Pruning</h3>
+
+
+<p>Remove branches that contribute little to prediction accuracy.</p>
+
+
+<hr>
+
+
+<h1>11. Advantages</h1>
+
+
+<ul>
+<li>Easy to understand and interpret.</li>
+<li>Easy to visualize.</li>
+<li>Handles both numerical and categorical data.</li>
+<li>No feature scaling required.</li>
+<li>Can solve both classification and regression problems.</li>
+<li>Captures non-linear relationships.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>12. Limitations</h1>
+
+
+<ul>
+<li>Can easily overfit.</li>
+<li>Sensitive to small changes in the dataset.</li>
+<li>Deep trees become difficult to interpret.</li>
+<li>Usually less accurate than ensemble methods like Random Forest.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>Why Doesn&#39;t a Decision Tree Need Feature Scaling?</h1>
+
+
+<p>Decision Trees make decisions using thresholds.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">Age &lt; 30?
+
+Salary > 50000?</code></pre>
+
+<p>The actual scale of the feature doesn&#39;t affect these comparisons.</p>
+
+
+<h3>Interview Answer</h3>
+
+
+<blockquote>
+<p>Decision Trees do not require feature scaling because they split data based on feature thresholds. Scaling changes the values but preserves their order, so the split decisions remain the same.</p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>Scikit-Learn Implementation</h1>
+
+
+<pre class="language-python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeClassifier
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>datasets <span class="token keyword">import</span> load_iris
+
+iris <span class="token operator">=</span> load_iris<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+X <span class="token operator">=</span> iris<span class="token punctuation">.</span>data
+y <span class="token operator">=</span> iris<span class="token punctuation">.</span>target
+
+model <span class="token operator">=</span> DecisionTreeClassifier<span class="token punctuation">(</span>
+    criterion<span class="token operator">=</span><span class="token string">"gini"</span><span class="token punctuation">,</span>
+    max_depth<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span>
+    random_state<span class="token operator">=</span><span class="token number">42</span>
+<span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+
+prediction <span class="token operator">=</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span><span class="token punctuation">[</span>X<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Prediction:"</span><span class="token punctuation">,</span> prediction<span class="token punctuation">)</span></code></pre>
+
+<h3>Common Parameters</h3>
+
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>criterion</code></td>
+<td><code>&quot;gini&quot;</code> or <code>&quot;entropy&quot;</code></td>
+</tr>
+<tr>
+<td><code>max_depth</code></td>
+<td>Maximum depth of the tree</td>
+</tr>
+<tr>
+<td><code>min_samples_split</code></td>
+<td>Minimum samples required to split a node</td>
+</tr>
+<tr>
+<td><code>min_samples_leaf</code></td>
+<td>Minimum samples required in a leaf</td>
+</tr>
+<tr>
+<td><code>random_state</code></td>
+<td>Ensures reproducible results</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h1>🎤 Top 10 Interview Questions with Answers</h1>
+
+
+<h2>1. What is a Decision Tree?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>A Decision Tree is a supervised machine learning algorithm used for classification and regression. It predicts the output by recursively splitting the data based on the feature that best separates the data into more homogeneous groups.</p>
+
+
+<hr>
+
+
+<h2>2. Why is it called a Decision Tree?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>It is called a Decision Tree because it makes decisions in a tree-like structure, starting from a root node, following branches based on feature values, and ending at a leaf node containing the final prediction.</p>
+
+
+<hr>
+
+
+<h2>3. How does a Decision Tree choose the best feature to split?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>A Decision Tree evaluates possible splits using impurity measures such as Gini Index or Entropy. It selects the split that creates the purest child nodes by minimizing impurity or maximizing Information Gain.</p>
+
+
+<hr>
+
+
+<h2>4. What is the Gini Index?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>The Gini Index is an impurity measure used to evaluate how mixed the classes are in a node. Lower Gini values indicate purer nodes. Scikit-Learn uses Gini as the default criterion.</p>
+
+
+<hr>
+
+
+<h2>5. What is Entropy?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Entropy measures the impurity or randomness in a node. The Decision Tree selects the split with the highest Information Gain, which corresponds to the greatest reduction in entropy.</p>
+
+
+<hr>
+
+
+<h2>6. What is Information Gain?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Information Gain measures how much a split reduces entropy. A higher Information Gain indicates a better split because it creates purer child nodes.</p>
+
+
+<hr>
+
+
+<h2>7. What is overfitting in a Decision Tree?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Overfitting occurs when the tree becomes too deep and memorizes the training data instead of learning general patterns, resulting in poor performance on unseen data.</p>
+
+
+<hr>
+
+
+<h2>8. How can overfitting be reduced?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Overfitting can be reduced by limiting the tree depth (<code>max_depth</code>), increasing <code>min_samples_split</code>, increasing <code>min_samples_leaf</code>, or pruning unnecessary branches.</p>
+
+
+<hr>
+
+
+<h2>9. Why doesn&#39;t a Decision Tree require feature scaling?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p>Decision Trees split data based on thresholds, such as <code>Age &lt; 30</code>. Since scaling preserves the order of values, it does not affect the split decisions, so feature scaling is unnecessary.</p>
+
+
+<hr>
+
+
+<h2>10. What are the advantages and limitations of Decision Trees?</h2>
+
+
+<p><strong>Answer:</strong></p>
+
+
+<p><strong>Advantages:</strong></p>
+
+
+<ul>
+<li>Easy to understand and visualize.</li>
+<li>Handles numerical and categorical data.</li>
+<li>No feature scaling required.</li>
+<li>Supports both classification and regression.</li>
+<li>Captures non-linear relationships.</li>
+</ul>
+
+
+<p><strong>Limitations:</strong></p>
+
+
+<ul>
+<li>Prone to overfitting.</li>
+<li>Sensitive to small changes in data.</li>
+<li>Deep trees become complex.</li>
+<li>Usually less accurate than ensemble methods like Random Forest.</li>
+</ul>
+
+
+<hr>
+
+
+<h1>📝 Quick Revision (2-Minute Recap)</h1>
+
+
+<ul>
+<li>A <strong>Decision Tree</strong> is a supervised algorithm used for <strong>classification</strong> and <strong>regression</strong>.</li>
+<li>It predicts by asking a sequence of questions in a <strong>tree-like structure</strong>.</li>
+<li>The tree selects the best split using <strong>Gini Index</strong> or <strong>Entropy (Information Gain)</strong>.</li>
+<li><strong>Lower Gini</strong> and <strong>higher Information Gain</strong> indicate better splits.</li>
+<li><strong>Overfitting</strong> occurs when the tree memorizes the training data.</li>
+<li>Reduce overfitting using <strong><code>max_depth</code></strong>, <strong><code>min_samples_split</code></strong>, <strong><code>min_samples_leaf</code></strong>, or <strong>pruning</strong>.</li>
+<li>Decision Trees <strong>do not require feature scaling</strong> because they split based on thresholds, not distances.</li>
+<li>They are easy to interpret, handle non-linear relationships, and work for both classification and regression.</li>
+</ul>
+
+
+<p>These notes are concise but cover everything commonly expected about Decision Trees in <strong>campus placement interviews</strong>.</p>
+</article></main>
+</body>
+</html>
